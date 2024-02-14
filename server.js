@@ -11,21 +11,21 @@ const port = 3001;
 app.use(express.static('./public'));
 // serve from public
 
-let names = []; // Array to store names
+let times = []; // Array to store names
 
 app.get('/', (req, res) => {
   // send the names to the template
   res.sendFile(path.join(__dirname, './public', 'index.html'));
 });
 
-app.post('/add-name', (req, res) => {
-    const name = req.body.name;
-    names.push(name);
-    res.redirect('/');
+app.post('/add-time', (req, res) => {
+    const time = req.body.time;
+    times.push(time);
+    res.json(times);
   });
 // New route to list all names
-app.get('/names', (req, res) => {
-    res.json(names);
+app.get('/times', (req, res) => {
+    res.json(times);
   });
   
 app.listen(port, () => {

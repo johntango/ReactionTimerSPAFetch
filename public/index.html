@@ -4,24 +4,86 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Names List Fetch</title>
+    <style>
+      .green-button {
+        background-color: rgb(0, 128, 9);
+        color: white;
+      }
+      .red-button {
+        background-color: rgb(128, 0, 23);
+        color: white;
+      }
+    </style>
   </head>
   <body>
-    <h1>Add a Name</h1>
+    <h1>Add a Reaction Time</h1>
     <input type="text" id="name" name="name" placeholder="Enter a name here" />
-    <button onclick="sendName()">Submit</button>
+    <button id="start" onclick="start()" class="green-button">Start</button>
+    <button id="stop" onclick="stop()" class="green-button">Stop</button>
     <div id="namesList">
-      <h2>Names</h2>
-      <ul id="names"></ul>
+      <h2>Times</h2>
+      <ul id="times"></ul>
     </div>
 
     <script>
-      function writeNames(names) {
-        const namesList = document.getElementById("names");
-        namesList.innerHTML = ""; // Clear the list before adding new names
-        names.forEach((name) => {
-          const listItem = document.createElement("li");
-          listItem.textContent = name;
+      let startTime = 0;
+      let endTime = 0;
+      function start() {
+        // wait a random time between 1 and 5 seconds
+        setTimeout(() => {
+          // get cpu time
+          startTime = performance.now();
+          const stopButton = document.getElementById("stop");
+          stopButton.classList.remove("green-button");
+          stopButton.classList.add("red-button");
+        }, Math.floor(Math.random() * 4000) + 1000);
+      }
+      function stop() {
+        // get cpu time
+        endTime = performance.now();
+        console.log("Time: ", endTime - startTime);
+        const stopButton = document.getElementById("stop");
+        stopButton.classList.remove("red-button");
+        stopButton.classList.add("green-button");
+        sendTime();
+      }
+      function injectTime(data) {
+        const namesList = document.getElementById("times");
+        const listItem = document.createElement("li");
+        for (let i = 0; i < data.length; i++) {
+          listItem.textContent = data[i];
           namesList.appendChild(listItem);
+        }
+      }
+      async function sendTime() {
+        // calculate the reaction time
+        // make reaction time in integer
+
+        const reactionTime = parseInt(endTime - startTime);
+        try {
+          const response = await fetch("/add-time", {
+            method: "POST",
+            headers: {
+              // content
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ time: reactionTime }),
+          });
+          if (response.ok) {
+            const data = await response.json();
+            injectTime(data);
+          }
+        } catch (error) {
+          console.error("There was a problem with the fetch operation:", error);
+        }
+      }
+      function writeTimes(times) {
+        const timesList = document.getElementById("times");
+        timesList.innerHTML = ""; // Clear the list before adding new times
+        times.forEach((time) => {
+          const listItem = document.createElement("li");
+          listItem.textContent = time;
+          timesList.appendChild(listItem);
         });
       }
 
