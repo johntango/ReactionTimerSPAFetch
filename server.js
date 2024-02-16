@@ -20,7 +20,9 @@ app.get('/', (req, res) => {
 
 app.post('/add-time', (req, res) => {
     const time = req.body.time;
-    times.push(time);
+    const name = req.body.name;
+    let user = {time: time, name: name};
+    times.push(user);
     res.json(times);
   });
 // New route to list all names
